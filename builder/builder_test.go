@@ -1,9 +1,12 @@
 package builder
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/ikedam/terraform-registry-builder/file"
 )
 
 func TestBuilder(t *testing.T) {
@@ -99,4 +102,71 @@ func TestBuilder(t *testing.T) {
 			t.Errorf("Expected file not created: %s", expectedFile)
 		}
 	}
+
+	// Verify versions index.json content
+	testVersionsIndexContent := func(t *testing.T, providerType string, expectedVersions []string, expectedOS, expectedArch string) {
+		indexPath := filepath.Join(dstDir, providerType, "versions", "index.json")
+		data, err := os.ReadFile(indexPath)
+		if err != nil {
+			t.Fatalf("Failed to read versions index file %s: %v", indexPath, err)
+		}
+
+		var index file.VersionsIndex
+		err = json.Unmarshal(data, &index)
+		if err != nil {
+			t.Fatalf("Failed to parse versions index file %s: %v", indexPath, err)
+		}
+
+		// Verify ID
+		if index.ID != providerType {
+			t.Errorf("Index ID = %s, want %s", index.ID, providerType)
+		}
+
+		// Verify versions
+		if len(index.Versions) != len(expectedVersions) {
+			t.Errorf("Index contains %d versions, want %d", len(index.Versions), len(expectedVersions))
+		}
+
+		for i, expected := range expectedVersions {
+			if i >= len(index.Versions) {
+				t.Errorf("Missing expected version %s", expected)
+				continue
+			}
+
+			if index.Versions[i].Version != expected {
+				t.Errorf("Version at index %d = %s, want %s", i, index.Versions[i].Version, expected)
+			}
+
+			// Verify protocols
+			if len(index.Versions[i].Protocols) == 0 {
+				t.Errorf("No protocols defined for version %s", expected)
+			}
+
+			// Verify platforms
+			foundPlatform := false
+			for _, platform := range index.Versions[i].Platforms {
+				if platform.OS == expectedOS && platform.Arch == expectedArch {
+					foundPlatform = true
+					break
+				}
+			}
+
+			if !foundPlatform {
+				t.Errorf("Platform %s_%s not found for version %s", expectedOS, expectedArch, expected)
+			}
+		}
+	}
+
+	// Test each provider's versions index
+	t.Run("test provider versions", func(t *testing.T) {
+		testVersionsIndexContent(t, "test", []string{"1.0.0"}, "linux", "amd64")
+	})
+
+	t.Run("example provider versions", func(t *testing.T) {
+		testVersionsIndexContent(t, "example", []string{"2.0.0"}, "darwin", "arm64")
+	})
+
+	t.Run("nested provider versions", func(t *testing.T) {
+		testVersionsIndexContent(t, "nested", []string{"3.0.0"}, "windows", "386")
+	})
 }

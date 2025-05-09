@@ -110,10 +110,15 @@ func (b *Builder) processProviderFile(filePath string) error {
 		}
 	}
 
-	// Create empty index.json (versions)
+	// Create or update index.json (versions)
 	versionsIndexPath := filepath.Join(b.dstDir, info.TargetVersionsIndexPath())
-	if err := file.WriteEmptyFile(versionsIndexPath, "// FIXME: This file should be populated with version information\n"); err != nil {
-		return fmt.Errorf("failed to create versions index file: %w", err)
+	versionsIndex, err := file.ReadVersionsIndex(versionsIndexPath, info.Type)
+	if err != nil {
+		return fmt.Errorf("failed to read versions index file: %w", err)
+	}
+	versionsIndex.AddVersion(info.Version, info.OS, info.Arch)
+	if err := file.WriteVersionsIndex(versionsIndexPath, versionsIndex); err != nil {
+		return fmt.Errorf("failed to write versions index file: %w", err)
 	}
 
 	// Create empty index.json (download)
