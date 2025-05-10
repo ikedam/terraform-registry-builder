@@ -13,6 +13,6 @@ FROM alpine:3.21.3
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
-COPY --from=builder /app/terraform-registry-builder .
+COPY --from=builder /app/terraform-registry-builder /terraform-registry-builder
 
-ENTRYPOINT ["./terraform-registry-builder"]
+ENTRYPOINT ["/terraform-registry-builder"]
