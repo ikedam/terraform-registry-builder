@@ -42,6 +42,93 @@ DST ディレクトリー以下には以下のようなファイルが構築さ�
 * `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)_SHA256SUMS`
 * `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)_SHA256SUMS.sig`
 
+## GPG キーのセットアップ
+
+Terraform レジストリーの仕様上、 GPG による署名が必要になります。
+このため利用にあたっては GPG の秘密鍵を用意してください。
+
+### GPG キーの作成方法
+
+新しい GPG キーペアを作成する場合は、以下の手順で実施できます:
+
+```bash
+# GPG キーを対話的に生成
+gpg --full-generate-key
+```
+
+上記コマンド実行後、以下の情報を入力します:
+1. キーの種類を選択 (デフォルトの RSA and RSA を推奨)
+2. キーサイズを設定 (4096 ビットを推奨)
+3. キーの有効期限を設定
+4. 名前とメールアドレスを入力
+5. コメントを必要に応じて入力
+6. パスフレーズを設定
+
+### GPG キー ID の確認
+
+生成されたキーの ID を確認します:
+
+```bash
+gpg --list-secret-keys --keyid-format LONG
+```
+
+出力例:
+```
+sec   rsa4096/3AA5C34371567BD2 2023-01-01 [SC] [expires: 2025-01-01]
+      1234567890ABCDEF1234567890ABCDEF12345678
+uid                 [ultimate] Your Name <your.email@example.com>
+ssb   rsa4096/4BB6D45482678BE3 2023-01-01 [E] [expires: 2025-01-01]
+```
+
+ここで `3AA5C34371567BD2` がキー ID になります。
+
+### GPG キーのエクスポート
+
+秘密鍵をエクスポートします:
+
+```bash
+# ASCII 形式で秘密鍵をエクスポート
+gpg --export-secret-keys --armor 3AA5C34371567BD2 > private_key.asc
+```
+
+### 環境変数の設定
+
+terraform-registry-builder で利用するために、以下の環境変数を設定します:
+
+```bash
+# 秘密鍵ファイルのパスを設定
+export TFREGBUILDER_GPG_KEY_FILE=/path/to/private_key.asc
+
+# または、秘密鍵の内容を直接設定することもできます
+export TFREGBUILDER_GPG_KEY="$(cat /path/to/private_key.asc)"
+
+# パスフレーズを設定
+export TFREGBUILDER_GPG_PASSPHRASE="your_passphrase_here"
+
+# キー ID を設定
+export TFREGBUILDER_GPG_ID="3AA5C34371567BD2"
+```
+
+### CI/CD 環境での設定
+
+GitHub Actions などの CI/CD 環境では、シークレットとして上記の値を設定し、ワークフロー内で環境変数として利用できます:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up GPG credentials
+        env:
+          TFREGBUILDER_GPG_KEY: ${{ secrets.TFREGBUILDER_GPG_KEY }}
+          TFREGBUILDER_GPG_PASSPHRASE: ${{ secrets.TFREGBUILDER_GPG_PASSPHRASE }}
+          TFREGBUILDER_GPG_ID: ${{ secrets.TFREGBUILDER_GPG_ID }}
+        run: |
+          # ここで terraform-registry-builder を実行
+          ./terraform-registry-builder SRC DST
+```
+
 ## CI/CD
 
 このプロジェクトでは以下のGitHub Actionsワークフローが設定されています：
