@@ -41,3 +41,29 @@ DST ディレクトリー以下には以下のようなファイルが構築さ�
 * `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH).zip`
 * `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)_SHA256SUMS`
 * `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)_SHA256SUMS.sig`
+
+## CI/CD
+
+このプロジェクトでは以下のGitHub Actionsワークフローが設定されています：
+
+### テスト実行
+
+- mainブランチへのプッシュ時
+- プルリクエストの作成・更新時
+- 自動でGoのテストが実行されます
+
+### リリース
+
+Gitリリースを作成すると以下が実行されます：
+
+1. バイナリビルド
+   - 以下のプラットフォーム向けにビルドされます：
+     - linux/amd64
+     - linux/arm64
+     - darwin/arm64
+     - windows/amd64
+   - ビルドされたバイナリはリリースアセットとして添付されます
+
+2. Dockerイメージ作成
+   - マルチプラットフォーム (linux/amd64, linux/arm64) のDockerイメージが作成されます
+   - イメージはGitHub Container Registry (ghcr.io)にプッシュされます
