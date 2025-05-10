@@ -6,8 +6,50 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/ProtonMail/gopenpgp/v3/crypto"
 	"github.com/ikedam/terraform-registry-builder/file"
 )
+
+func TestMain(m *testing.M) {
+	// Setup GPG environment for all tests
+	if os.Getenv("TFREGBUILDER_GPG_KEY") == "" {
+		keyName := "terraform-registry-builder-test"
+		email := "test@example.com"
+		passphrase := "testpassphrase"
+
+		// Initialize PGP
+		pgp := crypto.PGP()
+
+		// Create a key generation handle
+		keyGenHandle := pgp.KeyGeneration().
+			AddUserId(keyName, email).
+			New()
+
+		// Generate key
+		key, err := keyGenHandle.GenerateKey()
+		if err != nil {
+			panic(err)
+		}
+
+		// Get the armored version of the key
+		armored, err := key.Armor()
+		if err != nil {
+			panic(err)
+		}
+
+		// Get key ID from fingerprint
+		fingerprint := key.GetFingerprint()
+		keyID := fingerprint[len(fingerprint)-16:] // last 16 chars of fingerprint
+
+		// Set environment variables
+		os.Setenv("TFREGBUILDER_GPG_KEY", armored)
+		os.Setenv("TFREGBUILDER_GPG_PASSPHRASE", passphrase)
+		os.Setenv("TFREGBUILDER_GPG_ID", keyID)
+	}
+
+	// Run tests
+	os.Exit(m.Run())
+}
 
 func TestBuilder(t *testing.T) {
 	// Create temporary source and destination directories for tests

@@ -121,22 +121,25 @@ func (b *Builder) processProviderFile(filePath string) error {
 		return fmt.Errorf("failed to write versions index file: %w", err)
 	}
 
-	// Create empty index.json (download)
-	downloadIndexPath := filepath.Join(b.dstDir, info.TargetDownloadIndexPath())
-	if err := file.WriteEmptyFile(downloadIndexPath, "// FIXME: This file should be populated with download information\n"); err != nil {
-		return fmt.Errorf("failed to create download index file: %w", err)
-	}
-
-	// Create empty SHA256SUMS file
+	// Create SHA256SUMS file
+	targetZipPath := filepath.Join(b.dstDir, info.TargetZipPath())
 	shaSumsPath := filepath.Join(b.dstDir, info.TargetSHASumsPath())
-	if err := file.WriteEmptyFile(shaSumsPath, "// FIXME: This file should contain SHA256 checksum of the zip file\n"); err != nil {
+	_, err = file.WriteSHA256SumsFile(targetZipPath, shaSumsPath)
+	if err != nil {
 		return fmt.Errorf("failed to create SHA sums file: %w", err)
 	}
 
-	// Create empty signature file
+	// Sign SHA256SUMS file
 	sigPath := filepath.Join(b.dstDir, info.TargetSigPath())
-	if err := file.WriteEmptyFile(sigPath, "// FIXME: This file should contain a cryptographic signature of the SHA256SUMS file\n"); err != nil {
+	_, err = file.SignFile(shaSumsPath, sigPath)
+	if err != nil {
 		return fmt.Errorf("failed to create signature file: %w", err)
+	}
+
+	// Create index.json (download)
+	downloadIndexPath := filepath.Join(b.dstDir, info.TargetDownloadIndexPath())
+	if err := file.WriteDownloadIndex(targetZipPath, shaSumsPath, sigPath, downloadIndexPath); err != nil {
+		return fmt.Errorf("failed to create download index file: %w", err)
 	}
 
 	return nil
