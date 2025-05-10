@@ -257,3 +257,72 @@ func TestGPGFunctions(t *testing.T) {
 		}
 	})
 }
+
+func TestGetGPGPrivateKeyNoID(t *testing.T) {
+	// Setup test environment
+	cleanup := SetupTestGPG(t)
+	defer cleanup()
+
+	// Get the original key and ID for verification later
+	originalKeyID := os.Getenv("TFREGBUILDER_GPG_ID")
+	originalKey := os.Getenv("TFREGBUILDER_GPG_KEY")
+
+	// Create a temporary key file
+	tmpKeyFile, err := os.CreateTemp("", "gpg-key-*.asc")
+	if err != nil {
+		t.Fatalf("Failed to create temp key file: %v", err)
+	}
+	defer os.Remove(tmpKeyFile.Name())
+
+	// Write the key to the file
+	if _, err := tmpKeyFile.WriteString(originalKey); err != nil {
+		t.Fatalf("Failed to write key to temp file: %v", err)
+	}
+	if err := tmpKeyFile.Close(); err != nil {
+		t.Fatalf("Failed to close temp file: %v", err)
+	}
+
+	// Test 1: Key file with no ID set
+	t.Run("KeyFileWithNoID", func(t *testing.T) {
+		// Temporarily unset TFREGBUILDER_GPG_ID and set TFREGBUILDER_GPG_KEY_FILE
+		os.Unsetenv("TFREGBUILDER_GPG_ID")
+		os.Unsetenv("TFREGBUILDER_GPG_KEY")
+		os.Setenv("TFREGBUILDER_GPG_KEY_FILE", tmpKeyFile.Name())
+
+		// Call GetGPGPrivateKey
+		_, _, extractedKeyID, err := GetGPGPrivateKey()
+		if err != nil {
+			t.Fatalf("GetGPGPrivateKey error: %v", err)
+		}
+
+		// Verify extracted key ID matches the original
+		if extractedKeyID == "" {
+			t.Error("Failed to extract key ID from key file")
+		}
+		if extractedKeyID != originalKeyID {
+			t.Errorf("Extracted key ID = %s, want %s", extractedKeyID, originalKeyID)
+		}
+	})
+
+	// Test 2: Direct key content with no ID set
+	t.Run("DirectKeyWithNoID", func(t *testing.T) {
+		// Temporarily unset TFREGBUILDER_GPG_ID and use direct key content
+		os.Unsetenv("TFREGBUILDER_GPG_ID")
+		os.Unsetenv("TFREGBUILDER_GPG_KEY_FILE")
+		os.Setenv("TFREGBUILDER_GPG_KEY", originalKey)
+
+		// Call GetGPGPrivateKey
+		_, _, extractedKeyID, err := GetGPGPrivateKey()
+		if err != nil {
+			t.Fatalf("GetGPGPrivateKey error: %v", err)
+		}
+
+		// Verify extracted key ID matches the original
+		if extractedKeyID == "" {
+			t.Error("Failed to extract key ID from key content")
+		}
+		if extractedKeyID != originalKeyID {
+			t.Errorf("Extracted key ID = %s, want %s", extractedKeyID, originalKeyID)
+		}
+	})
+}

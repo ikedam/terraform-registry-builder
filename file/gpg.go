@@ -78,17 +78,13 @@ func WriteSHA256SumsFile(zipFilePath, shaSumsPath string) (string, error) {
 
 // GetGPGPrivateKey gets the GPG private key from environment variables.
 func GetGPGPrivateKey() (string, string, string, error) {
-	// Get key ID
-	keyID := os.Getenv("TFREGBUILDER_GPG_ID")
-	if keyID == "" {
-		return "", "", "", fmt.Errorf("TFREGBUILDER_GPG_ID environment variable not set")
-	}
+	// Get key ID and private key
+	var keyID, privateKey string
 
 	// Get passphrase
 	passphrase := os.Getenv("TFREGBUILDER_GPG_PASSPHRASE")
 
 	// Get private key from file or direct content
-	var privateKey string
 	keyFile := os.Getenv("TFREGBUILDER_GPG_KEY_FILE")
 	if keyFile != "" {
 		data, err := os.ReadFile(keyFile)
@@ -96,10 +92,50 @@ func GetGPGPrivateKey() (string, string, string, error) {
 			return "", "", "", fmt.Errorf("failed to read GPG key file: %w", err)
 		}
 		privateKey = string(data)
+
+		// Extract key ID from the private key if not specified in environment
+		keyID = os.Getenv("TFREGBUILDER_GPG_ID")
+		if keyID == "" {
+			// Parse the key to extract the key ID
+			key, err := crypto.NewKeyFromArmored(privateKey)
+			if err != nil {
+				return "", "", "", fmt.Errorf("failed to parse private key from file: %w", err)
+			}
+			// Extract fingerprint
+			fingerprint := key.GetFingerprint()
+			if fingerprint == "" {
+				return "", "", "", fmt.Errorf("could not extract key ID from key file")
+			}
+			// Use last 16 characters of fingerprint as key ID (standard format)
+			if len(fingerprint) >= 16 {
+				keyID = fingerprint[len(fingerprint)-16:]
+			} else {
+				keyID = fingerprint // Fallback to using the whole fingerprint
+			}
+		}
 	} else {
 		privateKey = os.Getenv("TFREGBUILDER_GPG_KEY")
 		if privateKey == "" {
 			return "", "", "", fmt.Errorf("either TFREGBUILDER_GPG_KEY_FILE or TFREGBUILDER_GPG_KEY must be set")
+		}
+
+		// Get key ID from environment when using direct key content
+		keyID = os.Getenv("TFREGBUILDER_GPG_ID")
+		if keyID == "" {
+			// Also try to extract from direct key content
+			key, err := crypto.NewKeyFromArmored(privateKey)
+			if err != nil {
+				return "", "", "", fmt.Errorf("TFREGBUILDER_GPG_ID environment variable not set and could not extract key ID from key content")
+			}
+			fingerprint := key.GetFingerprint()
+			if fingerprint == "" {
+				return "", "", "", fmt.Errorf("TFREGBUILDER_GPG_ID environment variable not set and could not extract key ID")
+			}
+			if len(fingerprint) >= 16 {
+				keyID = fingerprint[len(fingerprint)-16:]
+			} else {
+				keyID = fingerprint
+			}
 		}
 	}
 
