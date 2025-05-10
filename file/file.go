@@ -78,7 +78,7 @@ func CreateZipFromBinary(binaryPath, zipPath string) error {
 	// Set zero time
 	// nolint: staticcheck
 	header.SetModTime(time.Time{})
-	header.SetMode(0644)
+	header.SetMode(0755)
 
 	// Add the binary to the zip
 	writer, err := zipWriter.CreateHeader(header)

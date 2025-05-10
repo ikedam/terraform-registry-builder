@@ -177,8 +177,8 @@ func TestCreateZipFromBinary(t *testing.T) {
 	}
 
 	// Check file mode
-	if zipFile.Mode() != 0644 {
-		t.Errorf("Zip entry mode = %v, want %v", zipFile.Mode(), 0644)
+	if zipFile.Mode() != 0755 {
+		t.Errorf("Zip entry mode = %v, want %v", zipFile.Mode(), 0755)
 	}
 
 	// Check modified time
