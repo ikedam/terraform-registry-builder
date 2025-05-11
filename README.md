@@ -4,6 +4,14 @@
 
 プライベート Terraform レジストリーとして稼働させるための静的サイトを構築します。
 
+## 入手方法
+
+* A: Github の Releases からバイナリーをダウンロードする:
+    * https://github.com/ikedam/terraform-registry-builder/releases
+* B: `ghcr.io/ikedam/terraform-registry-builder` からコンテナーイメージをダウンロードする:
+    * https://github.com/ikedam/terraform-registry-builder/pkgs/container/terraform-registry-builder
+
+
 ## 実行方法
 
 ```
@@ -105,9 +113,11 @@ export TFREGBUILDER_GPG_KEY_FILE=/path/to/private_key.asc
 export TFREGBUILDER_GPG_KEY="$(cat /path/to/private_key.asc)"
 
 # パスフレーズを設定
+# (パスフレーズが設定されていない場合は省略可能)
 export TFREGBUILDER_GPG_PASSPHRASE="your_passphrase_here"
 
 # キー ID を設定
+# (キーが1つしか含まれていない場合は省略可能)
 export TFREGBUILDER_GPG_ID="3AA5C34371567BD2"
 ```
 
