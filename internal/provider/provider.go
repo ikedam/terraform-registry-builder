@@ -18,8 +18,8 @@ type ProviderInfo struct {
 
 var (
 	// Regular expression to match provider file names.
-	// Format: terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)[.zip]
-	providerRegex = regexp.MustCompile(`^terraform-provider-([^-]+)-v([^_]+)_([^_]+)_([^.]+)(?:\.zip)?$`)
+	// Format: terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)[.zip]
+	providerRegex = regexp.MustCompile(`^terraform-provider-([^-]+)_v([^_]+)_([^_]+)_([^.]+)(?:\.zip)?$`)
 )
 
 // ParseProviderFileName parses a provider file name and returns the provider information.
@@ -69,7 +69,7 @@ func (p *ProviderInfo) TargetDownloadIndexPath() string {
 
 // TargetZipFileName returns the name of the target zip file.
 func (p *ProviderInfo) TargetZipFileName() string {
-	return fmt.Sprintf("terraform-provider-%s-v%s_%s_%s.zip", p.Type, p.Version, p.OS, p.Arch)
+	return fmt.Sprintf("terraform-provider-%s_v%s_%s_%s.zip", p.Type, p.Version, p.OS, p.Arch)
 }
 
 // TargetZipPath returns the full path to the target zip file.

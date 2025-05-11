@@ -18,12 +18,14 @@ terraform-registry-builder SRC DST
 SRC ディレクトリー以下に配置するファイル名は以下のフォーマットとしてください。
 再帰的に探索を行うので、途中のディレクトリー構造は問いません:
 
-* バイナリーファイルの場合: `terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)`
-* zip ファイルの場合: `terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH).zip`
+* バイナリーファイルの場合: `terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)`
+* zip ファイルの場合: `terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH).zip`
 
 バイナリーファイルのみが提供されている場合は、以下の仕様の zip ファイルを作成します:
 
 * 中身はバイナリーファイルだけ。
+* バイナリーファイルの名称は  `terraform-provider-(TYPE)_v(VERSION)` になる。
+    * `_(OS)_(ARCH)` の部分が削除されます。
 * 中に含まれるファイルのファイルのモードは 0755 固定
 * 中に含まれるファイルのファイルの時刻を 2049年1月1日 0時0分0秒 に固定します。
 
@@ -32,15 +34,15 @@ SRC ディレクトリー以下に配置するファイル名は以下のフォ�
 DST ディレクトリーには、Terraform プロバイダーのネームスペースディレクトリーを指定してください。
 例えば配置するプロバイダーが `(DOMAIN)/(NAMESPACE)/(TYPE)` で指定される場合、 `providers/(NANESPACE)` を指定します。
 
-SRC ディレクトリーに `terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)` がある場合、
+SRC ディレクトリーに `terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)` がある場合、
 DST ディレクトリー以下には以下のようなファイルが構築されます:
 
 * `(TYPE)/versions/index.json`
     * 既存のファイルがある場合は既存ファイルに追記する。
 * `(TYPE)/(VERSION)/download/(OS)/(ARCH)/index.json`
-* `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH).zip`
-* `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)_SHA256SUMS`
-* `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)-v(VERSION)_(OS)_(ARCH)_SHA256SUMS.sig`
+* `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH).zip`
+* `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)_SHA256SUMS`
+* `(TYPE)/(VERSION)/download/(OS)/(ARCH)/terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)_SHA256SUMS.sig`
 
 ## GPG キーのセットアップ
 

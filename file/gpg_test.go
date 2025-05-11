@@ -199,14 +199,14 @@ func TestGPGFunctions(t *testing.T) {
 		defer os.RemoveAll(tmpDir)
 
 		// Create mock paths
-		zipPath := tmpDir + "/terraform-provider-test-v1.0.0_linux_amd64.zip"
-		shaPath := tmpDir + "/terraform-provider-test-v1.0.0_linux_amd64.zip_SHA256SUMS"
-		sigPath := tmpDir + "/terraform-provider-test-v1.0.0_linux_amd64.zip_SHA256SUMS.sig"
+		zipPath := tmpDir + "/terraform-provider-test_v1.0.0_linux_amd64.zip"
+		shaPath := tmpDir + "/terraform-provider-test_v1.0.0_linux_amd64.zip_SHA256SUMS"
+		sigPath := tmpDir + "/terraform-provider-test_v1.0.0_linux_amd64.zip_SHA256SUMS.sig"
 		indexPath := tmpDir + "/index.json"
 
 		// Create mock content
 		zipContent := []byte("mock zip content")
-		shaContent := "abcdef1234567890  terraform-provider-test-v1.0.0_linux_amd64.zip\n"
+		shaContent := "abcdef1234567890  terraform-provider-test_v1.0.0_linux_amd64.zip\n"
 		sigContent := []byte("mock signature")
 
 		// Write mock files

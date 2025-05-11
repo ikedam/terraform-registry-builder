@@ -17,7 +17,7 @@ func TestParseProviderFileName(t *testing.T) {
 	}{
 		{
 			name:        "valid binary filename",
-			filename:    "terraform-provider-aws-v1.2.3_linux_amd64",
+			filename:    "terraform-provider-aws_v1.2.3_linux_amd64",
 			wantType:    "aws",
 			wantVersion: "1.2.3",
 			wantOS:      "linux",
@@ -26,7 +26,7 @@ func TestParseProviderFileName(t *testing.T) {
 		},
 		{
 			name:        "valid zip filename",
-			filename:    "terraform-provider-google-v2.0.0_darwin_arm64.zip",
+			filename:    "terraform-provider-google_v2.0.0_darwin_arm64.zip",
 			wantType:    "google",
 			wantVersion: "2.0.0",
 			wantOS:      "darwin",
@@ -35,7 +35,7 @@ func TestParseProviderFileName(t *testing.T) {
 		},
 		{
 			name:        "filename with path",
-			filename:    "/some/path/to/terraform-provider-azure-v0.12.0_windows_386.zip",
+			filename:    "/some/path/to/terraform-provider-azure_v0.12.0_windows_386.zip",
 			wantType:    "azure",
 			wantVersion: "0.12.0",
 			wantOS:      "windows",
@@ -134,42 +134,42 @@ func TestProviderInfo_Paths(t *testing.T) {
 	})
 
 	t.Run("TargetZipFileName", func(t *testing.T) {
-		expected := "terraform-provider-example-v1.0.0_linux_amd64.zip"
+		expected := "terraform-provider-example_v1.0.0_linux_amd64.zip"
 		if got := info.TargetZipFileName(); got != expected {
 			t.Errorf("TargetZipFileName() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetZipPath", func(t *testing.T) {
-		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example-v1.0.0_linux_amd64.zip")
+		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64.zip")
 		if got := info.TargetZipPath(); got != expected {
 			t.Errorf("TargetZipPath() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSHASumsFileName", func(t *testing.T) {
-		expected := "terraform-provider-example-v1.0.0_linux_amd64.zip_SHA256SUMS"
+		expected := "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS"
 		if got := info.TargetSHASumsFileName(); got != expected {
 			t.Errorf("TargetSHASumsFileName() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSHASumsPath", func(t *testing.T) {
-		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example-v1.0.0_linux_amd64.zip_SHA256SUMS")
+		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS")
 		if got := info.TargetSHASumsPath(); got != expected {
 			t.Errorf("TargetSHASumsPath() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSigFileName", func(t *testing.T) {
-		expected := "terraform-provider-example-v1.0.0_linux_amd64.zip_SHA256SUMS.sig"
+		expected := "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS.sig"
 		if got := info.TargetSigFileName(); got != expected {
 			t.Errorf("TargetSigFileName() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSigPath", func(t *testing.T) {
-		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example-v1.0.0_linux_amd64.zip_SHA256SUMS.sig")
+		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS.sig")
 		if got := info.TargetSigPath(); got != expected {
 			t.Errorf("TargetSigPath() = %v, want %v", got, expected)
 		}
@@ -180,8 +180,8 @@ func TestProviderInfo_Paths(t *testing.T) {
 			filename string
 			want     bool
 		}{
-			{"terraform-provider-example-v1.0.0_linux_amd64.zip", true},
-			{"terraform-provider-example-v1.0.0_linux_amd64", false},
+			{"terraform-provider-example_v1.0.0_linux_amd64.zip", true},
+			{"terraform-provider-example_v1.0.0_linux_amd64", false},
 		}
 
 		for _, tt := range tests {
