@@ -65,7 +65,8 @@ func ReadVersionsIndex(path string, id string) (*VersionsIndex, error) {
 }
 
 // AddVersion adds or updates a version in the index.
-func (vi *VersionsIndex) AddVersion(version, os, arch string) {
+// Returns true if the version/platform was added, false if it already existed and was skipped.
+func (vi *VersionsIndex) AddVersion(version, os, arch string) bool {
 	// Check if this version already exists
 	var existingVersion *VersionInfo
 	for i := range vi.Versions {
@@ -75,6 +76,7 @@ func (vi *VersionsIndex) AddVersion(version, os, arch string) {
 		}
 	}
 
+	added := false
 	// If version doesn't exist, create it
 	if existingVersion == nil {
 		vi.Versions = append(vi.Versions, VersionInfo{
@@ -87,6 +89,7 @@ func (vi *VersionsIndex) AddVersion(version, os, arch string) {
 				},
 			},
 		})
+		added = true
 	} else {
 		// Check if this platform already exists for the version
 		platformExists := false
@@ -103,6 +106,7 @@ func (vi *VersionsIndex) AddVersion(version, os, arch string) {
 				OS:   os,
 				Arch: arch,
 			})
+			added = true
 		}
 	}
 
@@ -110,6 +114,8 @@ func (vi *VersionsIndex) AddVersion(version, os, arch string) {
 	sort.Slice(vi.Versions, func(i, j int) bool {
 		return vi.Versions[i].Version > vi.Versions[j].Version
 	})
+
+	return added
 }
 
 // WriteVersionsIndex writes the versions index to a file.

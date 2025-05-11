@@ -83,46 +83,69 @@ func (b *Builder) processProviderFile(filePath string) error {
 		return fmt.Errorf("failed to parse provider file name %s: %w", filePath, err)
 	}
 
-	// Create target directories
-	targetPath := filepath.Join(b.dstDir, info.TargetDownloadPath())
-	if err := file.EnsureDir(targetPath); err != nil {
-		return fmt.Errorf("failed to create target directory %s: %w", targetPath, err)
-	}
-
-	// Create versions directory
-	versionsDir := filepath.Join(b.dstDir, info.Type, "versions")
-	if err := file.EnsureDir(versionsDir); err != nil {
-		return fmt.Errorf("failed to create versions directory %s: %w", versionsDir, err)
-	}
-
-	// Process file based on its type
-	if info.IsZipFile(filePath) {
-		// Copy zip file directly
-		targetZipPath := filepath.Join(b.dstDir, info.TargetZipPath())
-		if err := file.CopyFile(filePath, targetZipPath); err != nil {
-			return fmt.Errorf("failed to copy zip file: %w", err)
-		}
-	} else {
-		// Create zip from binary
-		targetZipPath := filepath.Join(b.dstDir, info.TargetZipPath())
-		if err := file.CreateZipFromBinary(filePath, targetZipPath); err != nil {
-			return fmt.Errorf("failed to create zip from binary: %w", err)
-		}
-	}
-
-	// Create or update index.json (versions)
+	// First, check if this version/platform already exists in the index
 	versionsIndexPath := filepath.Join(b.dstDir, info.TargetVersionsIndexPath())
 	versionsIndex, err := file.ReadVersionsIndex(versionsIndexPath, info.Type)
 	if err != nil {
 		return fmt.Errorf("failed to read versions index file: %w", err)
 	}
+
+	// Check if the version/platform already exists before adding it
+	needsAdding := true
+	for _, ver := range versionsIndex.Versions {
+		if ver.Version == info.Version {
+			for _, plat := range ver.Platforms {
+				if plat.OS == info.OS && plat.Arch == info.Arch {
+					needsAdding = false
+					break
+				}
+			}
+			break
+		}
+	}
+
+	if !needsAdding {
+		fmt.Printf("Skipped %s version %s for %s/%s (already in index)\n", info.Type, info.Version, info.OS, info.Arch)
+		return nil // Skip further processing for this file
+	}
+
+	fmt.Printf("Adding %s version %s for %s/%s to index\n", info.Type, info.Version, info.OS, info.Arch)
+
+	// Create target directories
+	targetPath := filepath.Join(b.dstDir, info.TargetDownloadPath())
+	if err = file.EnsureDir(targetPath); err != nil {
+		return fmt.Errorf("failed to create target directory %s: %w", targetPath, err)
+	}
+
+	// Create versions directory
+	versionsDir := filepath.Join(b.dstDir, info.Type, "versions")
+	if err = file.EnsureDir(versionsDir); err != nil {
+		return fmt.Errorf("failed to create versions directory %s: %w", versionsDir, err)
+	}
+
+	// Define target paths
+	targetZipPath := filepath.Join(b.dstDir, info.TargetZipPath())
+
+	// Process file based on its type
+	if info.IsZipFile(filePath) {
+		// Copy zip file directly
+		if err = file.CopyFile(filePath, targetZipPath); err != nil {
+			return fmt.Errorf("failed to copy zip file: %w", err)
+		}
+	} else {
+		// Create zip from binary
+		if err = file.CreateZipFromBinary(filePath, targetZipPath); err != nil {
+			return fmt.Errorf("failed to create zip from binary: %w", err)
+		}
+	}
+
+	// Now add the version/platform to the index and write it
 	versionsIndex.AddVersion(info.Version, info.OS, info.Arch)
-	if err := file.WriteVersionsIndex(versionsIndexPath, versionsIndex); err != nil {
+	if err = file.WriteVersionsIndex(versionsIndexPath, versionsIndex); err != nil {
 		return fmt.Errorf("failed to write versions index file: %w", err)
 	}
 
 	// Create SHA256SUMS file
-	targetZipPath := filepath.Join(b.dstDir, info.TargetZipPath())
 	shaSumsPath := filepath.Join(b.dstDir, info.TargetSHASumsPath())
 	_, err = file.WriteSHA256SumsFile(targetZipPath, shaSumsPath)
 	if err != nil {
@@ -138,7 +161,7 @@ func (b *Builder) processProviderFile(filePath string) error {
 
 	// Create index.json (download)
 	downloadIndexPath := filepath.Join(b.dstDir, info.TargetDownloadIndexPath())
-	if err := file.WriteDownloadIndex(targetZipPath, shaSumsPath, sigPath, downloadIndexPath); err != nil {
+	if err = file.WriteDownloadIndex(targetZipPath, shaSumsPath, sigPath, downloadIndexPath); err != nil {
 		return fmt.Errorf("failed to create download index file: %w", err)
 	}
 
