@@ -131,6 +131,12 @@ jobs:
           ./terraform-registry-builder SRC DST
 ```
 
+## 動作についての制限事項
+
+* 登録されるプロトコルバージョンは 6.0 固定です。
+    * プロトコルバージョンについての詳細は [Terraform plugin protocol | Terraform | HashiCorp Developer](https://developer.hashicorp.com/terraform/plugin/terraform-plugin-protocol) を参照してください。
+* すでに登録されているバイナリーについては、同一内容かどうかのチェックは行わずに処理をスキップします。
+
 ## CI/CD
 
 このプロジェクトでは以下のGitHub Actionsワークフローが設定されています：

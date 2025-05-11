@@ -258,7 +258,7 @@ func WriteDownloadIndex(zipPath, shasumsPath, sigPath, downloadIndexPath string)
 
 	// Create download index
 	index := DownloadIndex{
-		Protocols:           []string{"5.0"},
+		Protocols:           []string{"6.0"},
 		OS:                  osPart,
 		Arch:                archPart,
 		Filename:            zipFileName,

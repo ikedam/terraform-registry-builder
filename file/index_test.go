@@ -157,7 +157,7 @@ func TestVersionsIndex(t *testing.T) {
 			Versions: []VersionInfo{
 				{
 					Version:   "3.0.0",
-					Protocols: []string{"5.0"},
+					Protocols: []string{"6.0"},
 					Platforms: []Platform{
 						{OS: "linux", Arch: "amd64"},
 					},

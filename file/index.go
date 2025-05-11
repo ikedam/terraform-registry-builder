@@ -79,7 +79,7 @@ func (vi *VersionsIndex) AddVersion(version, os, arch string) {
 	if existingVersion == nil {
 		vi.Versions = append(vi.Versions, VersionInfo{
 			Version:   version,
-			Protocols: []string{"5.0"},
+			Protocols: []string{"6.0"},
 			Platforms: []Platform{
 				{
 					OS:   os,
