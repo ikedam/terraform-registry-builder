@@ -121,22 +121,22 @@ func TestBuilder(t *testing.T) {
 		filepath.Join(dstDir, "test", "versions", "index.json"),
 		filepath.Join(dstDir, "test", "1.0.0", "download", "linux", "amd64", "index.json"),
 		filepath.Join(dstDir, "test", "1.0.0", "download", "linux", "amd64", "terraform-provider-test_v1.0.0_linux_amd64.zip"),
-		filepath.Join(dstDir, "test", "1.0.0", "download", "linux", "amd64", "terraform-provider-test_v1.0.0_linux_amd64.zip_SHA256SUMS"),
-		filepath.Join(dstDir, "test", "1.0.0", "download", "linux", "amd64", "terraform-provider-test_v1.0.0_linux_amd64.zip_SHA256SUMS.sig"),
+		filepath.Join(dstDir, "test", "1.0.0", "download", "linux", "amd64", "terraform-provider-test_v1.0.0_linux_amd64_SHA256SUMS"),
+		filepath.Join(dstDir, "test", "1.0.0", "download", "linux", "amd64", "terraform-provider-test_v1.0.0_linux_amd64_SHA256SUMS.sig"),
 
 		// For example provider
 		filepath.Join(dstDir, "example", "versions", "index.json"),
 		filepath.Join(dstDir, "example", "2.0.0", "download", "darwin", "arm64", "index.json"),
 		filepath.Join(dstDir, "example", "2.0.0", "download", "darwin", "arm64", "terraform-provider-example_v2.0.0_darwin_arm64.zip"),
-		filepath.Join(dstDir, "example", "2.0.0", "download", "darwin", "arm64", "terraform-provider-example_v2.0.0_darwin_arm64.zip_SHA256SUMS"),
-		filepath.Join(dstDir, "example", "2.0.0", "download", "darwin", "arm64", "terraform-provider-example_v2.0.0_darwin_arm64.zip_SHA256SUMS.sig"),
+		filepath.Join(dstDir, "example", "2.0.0", "download", "darwin", "arm64", "terraform-provider-example_v2.0.0_darwin_arm64_SHA256SUMS"),
+		filepath.Join(dstDir, "example", "2.0.0", "download", "darwin", "arm64", "terraform-provider-example_v2.0.0_darwin_arm64_SHA256SUMS.sig"),
 
 		// For nested provider
 		filepath.Join(dstDir, "nested", "versions", "index.json"),
 		filepath.Join(dstDir, "nested", "3.0.0", "download", "windows", "386", "index.json"),
 		filepath.Join(dstDir, "nested", "3.0.0", "download", "windows", "386", "terraform-provider-nested_v3.0.0_windows_386.zip"),
-		filepath.Join(dstDir, "nested", "3.0.0", "download", "windows", "386", "terraform-provider-nested_v3.0.0_windows_386.zip_SHA256SUMS"),
-		filepath.Join(dstDir, "nested", "3.0.0", "download", "windows", "386", "terraform-provider-nested_v3.0.0_windows_386.zip_SHA256SUMS.sig"),
+		filepath.Join(dstDir, "nested", "3.0.0", "download", "windows", "386", "terraform-provider-nested_v3.0.0_windows_386_SHA256SUMS"),
+		filepath.Join(dstDir, "nested", "3.0.0", "download", "windows", "386", "terraform-provider-nested_v3.0.0_windows_386_SHA256SUMS.sig"),
 	}
 
 	for _, expectedFile := range expectedFiles {

@@ -148,28 +148,28 @@ func TestProviderInfo_Paths(t *testing.T) {
 	})
 
 	t.Run("TargetSHASumsFileName", func(t *testing.T) {
-		expected := "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS"
+		expected := "terraform-provider-example_v1.0.0_linux_amd64_SHA256SUMS"
 		if got := info.TargetSHASumsFileName(); got != expected {
 			t.Errorf("TargetSHASumsFileName() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSHASumsPath", func(t *testing.T) {
-		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS")
+		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64_SHA256SUMS")
 		if got := info.TargetSHASumsPath(); got != expected {
 			t.Errorf("TargetSHASumsPath() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSigFileName", func(t *testing.T) {
-		expected := "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS.sig"
+		expected := "terraform-provider-example_v1.0.0_linux_amd64_SHA256SUMS.sig"
 		if got := info.TargetSigFileName(); got != expected {
 			t.Errorf("TargetSigFileName() = %v, want %v", got, expected)
 		}
 	})
 
 	t.Run("TargetSigPath", func(t *testing.T) {
-		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64.zip_SHA256SUMS.sig")
+		expected := filepath.Join("example", "1.0.0", "download", "linux", "amd64", "terraform-provider-example_v1.0.0_linux_amd64_SHA256SUMS.sig")
 		if got := info.TargetSigPath(); got != expected {
 			t.Errorf("TargetSigPath() = %v, want %v", got, expected)
 		}
@@ -188,6 +188,13 @@ func TestProviderInfo_Paths(t *testing.T) {
 			if got := info.IsZipFile(tt.filename); got != tt.want {
 				t.Errorf("IsZipFile(%q) = %v, want %v", tt.filename, got, tt.want)
 			}
+		}
+	})
+
+	t.Run("InnerZipFileName", func(t *testing.T) {
+		expected := "terraform-provider-example_v1.0.0"
+		if got := info.InnerZipFileName(); got != expected {
+			t.Errorf("InnerZipFileName() = %v, want %v", got, expected)
 		}
 	})
 }

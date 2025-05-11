@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/ikedam/terraform-registry-builder/internal/provider"
 )
 
 // EnsureDir ensures that a directory exists, creating it if necessary.
@@ -70,9 +72,15 @@ func CreateZipFromBinary(binaryPath, zipPath string) error {
 	}
 	defer binaryFile.Close()
 
-	// Create a zip header for the binary
+	// Extract provider information from binary path to create the correct inner file name
+	info, err := provider.ParseProviderFileName(binaryPath)
+	if err != nil {
+		return fmt.Errorf("failed to parse provider file name: %w", err)
+	}
+
+	// Create a zip header for the binary, using just TYPE and VERSION
 	header := &zip.FileHeader{
-		Name:   filepath.Base(binaryPath),
+		Name:   info.InnerZipFileName(),
 		Method: zip.Deflate,
 	}
 	// Set zero time

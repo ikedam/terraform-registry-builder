@@ -131,7 +131,7 @@ func TestCreateZipFromBinary(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	binaryPath := filepath.Join(tmpDir, "test-binary")
+	binaryPath := filepath.Join(tmpDir, "terraform-provider-test_v1.0.0_linux_amd64")
 	zipPath := filepath.Join(tmpDir, "output", "test.zip")
 	testContent := "This is test binary content"
 
@@ -170,8 +170,8 @@ func TestCreateZipFromBinary(t *testing.T) {
 
 	zipFile := zipReader.File[0]
 
-	// Check zip file name
-	expectedName := filepath.Base(binaryPath)
+	// Check zip file name - should be without OS and ARCH
+	expectedName := "terraform-provider-test_v1.0.0"
 	if zipFile.Name != expectedName {
 		t.Errorf("Zip entry name = %q, want %q", zipFile.Name, expectedName)
 	}

@@ -79,7 +79,7 @@ func (p *ProviderInfo) TargetZipPath() string {
 
 // TargetSHASumsFileName returns the name of the SHA sums file.
 func (p *ProviderInfo) TargetSHASumsFileName() string {
-	return p.TargetZipFileName() + "_SHA256SUMS"
+	return fmt.Sprintf("terraform-provider-%s_v%s_%s_%s_SHA256SUMS", p.Type, p.Version, p.OS, p.Arch)
 }
 
 // TargetSHASumsPath returns the full path to the SHA sums file.
@@ -100,4 +100,10 @@ func (p *ProviderInfo) TargetSigPath() string {
 // IsZipFile returns whether the original file is a zip file.
 func (p *ProviderInfo) IsZipFile(filename string) bool {
 	return strings.HasSuffix(filename, ".zip")
+}
+
+// InnerZipFileName returns the file name to be used inside the zip file,
+// without OS and ARCH information.
+func (p *ProviderInfo) InnerZipFileName() string {
+	return fmt.Sprintf("terraform-provider-%s_v%s", p.Type, p.Version)
 }
