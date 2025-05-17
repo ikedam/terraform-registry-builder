@@ -13,6 +13,7 @@ func TestParseProviderFileName(t *testing.T) {
 		wantVersion string
 		wantOS      string
 		wantArch    string
+		wantExt     string
 		wantErr     bool
 	}{
 		{
@@ -22,6 +23,7 @@ func TestParseProviderFileName(t *testing.T) {
 			wantVersion: "1.2.3",
 			wantOS:      "linux",
 			wantArch:    "amd64",
+			wantExt:     "",
 			wantErr:     false,
 		},
 		{
@@ -31,7 +33,23 @@ func TestParseProviderFileName(t *testing.T) {
 			wantVersion: "2.0.0",
 			wantOS:      "darwin",
 			wantArch:    "arm64",
+			wantExt:     "",
 			wantErr:     false,
+		},
+		{
+			name:        "windows binary filename with exe",
+			filename:    "terraform-provider-azure_v1.0.0_windows_amd64.exe",
+			wantType:    "azure",
+			wantVersion: "1.0.0",
+			wantOS:      "windows",
+			wantArch:    "amd64",
+			wantExt:     ".exe",
+			wantErr:     false,
+		},
+		{
+			name:     "windows binary filename with exe in zip - should error",
+			filename: "terraform-provider-azure_v1.0.0_windows_amd64.exe.zip",
+			wantErr:  true,
 		},
 		{
 			name:        "filename with path",
@@ -84,6 +102,10 @@ func TestParseProviderFileName(t *testing.T) {
 
 			if got.Arch != tt.wantArch {
 				t.Errorf("Arch = %v, want %v", got.Arch, tt.wantArch)
+			}
+
+			if got.Ext != tt.wantExt {
+				t.Errorf("Ext = %v, want %v", got.Ext, tt.wantExt)
 			}
 		})
 	}
@@ -192,9 +214,23 @@ func TestProviderInfo_Paths(t *testing.T) {
 	})
 
 	t.Run("InnerZipFileName", func(t *testing.T) {
+		// Test without .exe extension
 		expected := "terraform-provider-example_v1.0.0"
 		if got := info.InnerZipFileName(); got != expected {
 			t.Errorf("InnerZipFileName() = %v, want %v", got, expected)
+		}
+
+		// Test with .exe extension
+		infoWithExt := ProviderInfo{
+			Type:    "example",
+			Version: "1.0.0",
+			OS:      "windows",
+			Arch:    "amd64",
+			Ext:     ".exe",
+		}
+		expectedWithExt := "terraform-provider-example_v1.0.0.exe"
+		if got := infoWithExt.InnerZipFileName(); got != expectedWithExt {
+			t.Errorf("InnerZipFileName() with .exe = %v, want %v", got, expectedWithExt)
 		}
 	})
 }

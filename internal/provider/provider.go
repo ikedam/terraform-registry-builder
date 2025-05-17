@@ -14,12 +14,15 @@ type ProviderInfo struct {
 	Version string // Provider version, e.g., "0.1.0"
 	OS      string // Operating system, e.g., "linux"
 	Arch    string // Architecture, e.g., "amd64"
+	Ext     string // Extension for the binary (e.g., ".exe" for Windows)
 }
 
 var (
 	// Regular expression to match provider file names.
-	// Format: terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)[.zip]
-	providerRegex = regexp.MustCompile(`^terraform-provider-([^-]+)_v([^_]+)_([^_]+)_([^.]+)(?:\.zip)?$`)
+	// Format: terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH)[.exe] or
+	// terraform-provider-(TYPE)_v(VERSION)_(OS)_(ARCH).zip
+	// Note: .exe.zip is not allowed
+	providerRegex = regexp.MustCompile(`^terraform-provider-([^-]+)_v([^_]+)_([^_]+)_([^.]+)(?:(\.exe)$|(?:\.zip)$)?$`)
 )
 
 // ParseProviderFileName parses a provider file name and returns the provider information.
@@ -29,16 +32,22 @@ func ParseProviderFileName(filename string) (*ProviderInfo, error) {
 
 	// Match against the regex
 	matches := providerRegex.FindStringSubmatch(baseName)
-	if matches == nil || len(matches) != 5 {
+	if matches == nil || len(matches) != 6 {
 		return nil, fmt.Errorf("invalid provider file name format: %s", filename)
 	}
 
 	// Extract the components
+	ext := ""
+	if matches[5] != "" {
+		ext = matches[5] // This will be ".exe" or empty string
+	}
+
 	return &ProviderInfo{
 		Type:    matches[1],
 		Version: matches[2],
 		OS:      matches[3],
 		Arch:    matches[4],
+		Ext:     ext,
 	}, nil
 }
 
@@ -105,5 +114,5 @@ func (p *ProviderInfo) IsZipFile(filename string) bool {
 // InnerZipFileName returns the file name to be used inside the zip file,
 // without OS and ARCH information.
 func (p *ProviderInfo) InnerZipFileName() string {
-	return fmt.Sprintf("terraform-provider-%s_v%s", p.Type, p.Version)
+	return fmt.Sprintf("terraform-provider-%s_v%s%s", p.Type, p.Version, p.Ext)
 }
