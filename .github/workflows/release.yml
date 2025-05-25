@@ -41,7 +41,7 @@ jobs:
           fi
           
           # Build the binary
-          go build -v -o "terraform-registry-builder-${{ matrix.goos }}-${{ matrix.goarch }}${EXT}" .
+          CGO_ENABLED=0 go build -v -o "terraform-registry-builder-${{ matrix.goos }}-${{ matrix.goarch }}${EXT}" .
       
       - name: Upload binary to release
         uses: softprops/action-gh-release@v1
